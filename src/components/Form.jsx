@@ -15,7 +15,8 @@ const Form = props => {
         handleBlur,
         isValid,
         setFieldTouched,
-        isSubmitting
+        isSubmitting,
+        resetForm
     } = props;
 
     const onChange = e => {
@@ -46,7 +47,7 @@ const Form = props => {
                             required
                             onChange={onChange}
                             onBlur={onBlur}
-                            value={name}
+                            value={name || ''}
                         />
                     </Grid>
                     <Grid item xs={12}>
@@ -60,7 +61,7 @@ const Form = props => {
                             required
                             onChange={onChange}
                             onBlur={onBlur}
-                            value={email}
+                            value={email || ''}
                         />
                     </Grid>
                     <Grid item xs={12}>
@@ -75,7 +76,7 @@ const Form = props => {
                             required
                             onChange={onChange}
                             onBlur={onBlur}
-                            value={password}
+                            value={password || ''}
                         />
                     </Grid>
                     <Grid item xs={12}>
@@ -83,7 +84,7 @@ const Form = props => {
                             name='confirmPassword'
                             type='password'
                             variant='outlined'
-                            label='Confirm Password'
+                            label='Confirm password'
                             helperText={
                                 touched.confirmPassword &&
                                 errors.confirmPassword
@@ -96,19 +97,36 @@ const Form = props => {
                             required
                             onChange={onChange}
                             onBlur={onBlur}
-                            value={confirmPassword}
+                            value={confirmPassword || ''}
                         />
                     </Grid>
                     <Grid item xs={12}>
-                        <Button
-                            type='submit'
-                            variant='contained'
-                            color='primary'
-                            fullWidth
-                            disabled={!isValid || isSubmitting || !dirty}
-                        >
-                            Submit
-                        </Button>
+                        <Grid container spacing={2}>
+                            <Grid item xs={12}>
+                                <Button
+                                    type='submit'
+                                    variant='contained'
+                                    color='primary'
+                                    fullWidth
+                                    disabled={
+                                        !isValid || isSubmitting || !dirty
+                                    }
+                                >
+                                    Submit
+                                </Button>
+                            </Grid>
+                            <Grid item xs={12}>
+                                <Button
+                                    variant='contained'
+                                    color='secondary'
+                                    fullWidth
+                                    disabled={!dirty}
+                                    onClick={() => resetForm({})}
+                                >
+                                    Clear
+                                </Button>
+                            </Grid>
+                        </Grid>
                     </Grid>
                 </Grid>
             </form>

@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import Button from '@material-ui/core/Button';
+import ClickAwayListener from '@material-ui/core/ClickAwayListener';
 import {Formik} from 'formik';
 import * as Yup from 'yup';
 import Form from './Form';
@@ -18,14 +19,16 @@ const validationSchema = Yup.object().shape({
         .required('Confirm password is required')
 });
 
+const formInitialValues = {
+    name: '',
+    email: '',
+    password: '',
+    confirmPassword: ''
+};
+
 const Menu = () => {
     const [open, setOpen] = useState(false);
-    const [data, setData] = useState({
-        name: '',
-        email: '',
-        password: '',
-        confirmPassword: ''
-    });
+    const [data, setData] = useState(formInitialValues);
 
     const onChange = e => {
         const fieldName = e.target.name;
@@ -35,11 +38,23 @@ const Menu = () => {
         });
     };
 
-    const onSubmit = (values, {setSubmitting}) => {
+    const closeForm = () => {
+        setData(formInitialValues);
+        setOpen(false);
+    };
+
+    const onSubmit = (values, formikBag) => {
+        const {setSubmitting, resetForm} = formikBag;
         setTimeout(() => {
             setSubmitting(false);
+            setData(formInitialValues);
+            resetForm(formInitialValues);
+            setTimeout(() => {
+                setOpen(false);
+            }, 1000);
         }, 2000);
     };
+
     return (
         <div className={styles.root}>
             <Button variant='contained' onClick={() => setOpen(!open)}>
@@ -47,19 +62,21 @@ const Menu = () => {
             </Button>
             {data && <div className={styles.data}>{JSON.stringify(data)}</div>}
             {open && (
-                <div className={styles.sidebar}>
-                    <h2>Sidebar</h2>
-                    <Formik
-                        validationSchema={validationSchema}
-                        validateOnChange
-                        initialValues={data}
-                        isInitialValid={validationSchema.isValidSync(data)}
-                        onSubmit={onSubmit}
-                        render={props => (
-                            <Form onChangeHandler={onChange} {...props} />
-                        )}
-                    />
-                </div>
+                <ClickAwayListener onClickAway={closeForm}>
+                    <div className={styles.sidebar}>
+                        <h2>Sidebar</h2>
+                        <Formik
+                            validationSchema={validationSchema}
+                            validateOnChange
+                            initialValues={data}
+                            isInitialValid={validationSchema.isValidSync(data)}
+                            onSubmit={onSubmit}
+                            render={props => (
+                                <Form onChangeHandler={onChange} {...props} />
+                            )}
+                        />
+                    </div>
+                </ClickAwayListener>
             )}
         </div>
     );
