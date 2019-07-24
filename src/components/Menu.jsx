@@ -1,8 +1,22 @@
 import React, {useState} from 'react';
 import Button from '@material-ui/core/Button';
-import Grid from '@material-ui/core/Grid';
-import TextField from '@material-ui/core/TextField';
+import {Formik} from 'formik';
+import * as Yup from 'yup';
+import Form from './Form';
 import styles from './Menu.module.scss';
+
+const validationSchema = Yup.object().shape({
+    name: Yup.string().required('Name is required'),
+    email: Yup.string()
+        .email('Invalid email')
+        .required('Email is required'),
+    password: Yup.string()
+        .min(6, 'Should be at least 6 symbols')
+        .required('Password is required'),
+    confirmPassword: Yup.string()
+        .oneOf([Yup.ref('password')], 'Password does not match')
+        .required('Confirm password is required')
+});
 
 const Menu = () => {
     const [open, setOpen] = useState(false);
@@ -21,9 +35,10 @@ const Menu = () => {
         });
     };
 
-    const onSubmit = e => {
-        e.preventDefault();
-        setOpen(false);
+    const onSubmit = (values, {setSubmitting}) => {
+        setTimeout(() => {
+            setSubmitting(false);
+        }, 2000);
     };
     return (
         <div className={styles.root}>
@@ -34,62 +49,16 @@ const Menu = () => {
             {open && (
                 <div className={styles.sidebar}>
                     <h2>Sidebar</h2>
-                    <form onSubmit={onSubmit}>
-                        <Grid container spacing={2}>
-                            <Grid item xs={12}>
-                                <TextField
-                                    id='name'
-                                    name='name'
-                                    variant='outlined'
-                                    label='Name'
-                                    fullWidth
-                                    onChange={onChange}
-                                />
-                            </Grid>
-                            <Grid item xs={12}>
-                                <TextField
-                                    id='email'
-                                    name='email'
-                                    variant='outlined'
-                                    label='Email'
-                                    fullWidth
-                                    onChange={onChange}
-                                />
-                            </Grid>
-                            <Grid item xs={12}>
-                                <TextField
-                                    id='password'
-                                    name='password'
-                                    variant='outlined'
-                                    label='Password'
-                                    fullWidth
-                                    type='password'
-                                    onChange={onChange}
-                                />
-                            </Grid>
-                            <Grid item xs={12}>
-                                <TextField
-                                    id='confirmPassword'
-                                    name='confirmPassword'
-                                    variant='outlined'
-                                    label='Confirm Password'
-                                    fullWidth
-                                    type='password'
-                                    onChange={onChange}
-                                />
-                            </Grid>
-                            <Grid item xs={12}>
-                                <Button
-                                    type='submit'
-                                    fullWidth
-                                    variant='contained'
-                                    color='primary'
-                                >
-                                    Submit
-                                </Button>
-                            </Grid>
-                        </Grid>
-                    </form>
+                    <Formik
+                        validationSchema={validationSchema}
+                        validateOnChange
+                        initialValues={data}
+                        isInitialValid={validationSchema.isValidSync(data)}
+                        onSubmit={onSubmit}
+                        render={props => (
+                            <Form onChangeHandler={onChange} {...props} />
+                        )}
+                    />
                 </div>
             )}
         </div>
